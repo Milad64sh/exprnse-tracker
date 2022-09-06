@@ -6,14 +6,35 @@ const text = document.getElementById('text');
 const form = document.getElementById('form');
 const amount = document.getElementById('amount');
 
-const dummyTransactions = [
-  { id: 1, text: 'flower', amount: -20 },
-  { id: 2, text: 'salary', amount: 300 },
-  { id: 3, text: 'rent', amount: -100 },
-  { id: 4, text: 'net', amount: 30 },
-];
-let transactions = dummyTransactions;
+const localStorageTransactions = JSON.parse(
+  localStorage.getItem('transactions')
+);
+let transactions =
+  localStorage.getItem('transactions') !== null ? localStorageTransactions : [];
 
+// add transaction
+function addTransaction(e) {
+  e.preventDefault();
+  if (text.value.trim() === '' || amount.value.trim() === '') {
+    alert('Please add a text and amount');
+  } else {
+    const transaction = {
+      id: generateID(),
+      text: text.value,
+      amount: +amount.value,
+    };
+    transactions.push(transaction);
+    addTransactionDOM(transaction);
+    updatesValues();
+    updateLocalStorage();
+    text.value = '';
+    amount.value = '';
+  }
+}
+// ID generator
+function generateID() {
+  return Math.floor(Math.random() * 100000000);
+}
 // add transactions to DOM list
 function addTransactionDOM(transaction) {
   // Get sign
@@ -23,7 +44,9 @@ function addTransactionDOM(transaction) {
   item.classList.add(transaction.amount < 0 ? 'minus' : 'plus');
   item.innerHTML = `
   ${transaction.text}<span>${sign}${Math.abs(transaction.amount)}</span>
-  <button class="delete-btn">X</button>
+  <button class="delete-btn" onclick="removeTransaction(${
+    transaction.id
+  })">X</button>
   `;
   list.appendChild(item);
 }
@@ -44,6 +67,16 @@ function updatesValues() {
   money_plus.innerText = `$${income}`;
   money_minus.innerText = `$${expense}`;
 }
+// remove transaction by ID
+function removeTransaction(id) {
+  transactions = transactions.filter((transaction) => transaction.id !== id);
+  updateLocalStorage();
+  init();
+}
+// update local storage transactions
+function updateLocalStorage() {
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+}
 // init app
 function init() {
   list.innerHTML = '';
@@ -52,3 +85,5 @@ function init() {
 }
 
 init();
+
+form.addEventListener('submit', addTransaction);
