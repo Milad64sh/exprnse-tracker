@@ -101,10 +101,10 @@ input[type='number'] {
   margin: 10px 0;
 }
 .list li.plus {
-  border-right: #2ecc71;
+  border-right: 5px solid #2ecc71;
 }
 .list li.minus {
-  border-right: #c0392b;
+  border-right: 5px solid #c0392b;
 }
 .delete-btn {
   cursor: pointer;
